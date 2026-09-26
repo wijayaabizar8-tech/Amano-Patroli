@@ -295,7 +295,7 @@
     <div id="loginPage">
         <div class="login-card">
             <div class="card-title">🔐 Silakan Login Sistem</div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Masukkan Username dan Password Anda.</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Gunakan akun resmi Anda untuk masuk.</p>
             
             <label>Username:</label>
             <input type="text" id="loginUser" placeholder="Masukkan username...">
@@ -304,6 +304,12 @@
             <input type="password" id="loginPass" placeholder="Masukkan password...">
 
             <button class="btn btn-primary" style="margin-top: 15px;" onclick="prosesLogin()">Masuk Aplikasi</button>
+            
+            <div style="margin-top: 15px; font-size: 10px; color: #64748b; text-align: center; background: #f8fafc; padding: 8px; border-radius: 6px;">
+                💡 <b>Info Akun Bawaan:</b><br>
+                Admin: Username: <b>admin</b> | Pass: <b>komandan123</b><br>
+                Petugas: Username: <b>shodik</b> atau <b>muri</b> | Pass: <b>patroli123</b>
+            </div>
         </div>
     </div>
 
@@ -340,7 +346,7 @@
                 <input type="password" id="newMemberPass" placeholder="Contoh: patroli123">
                 <label>Nama Lengkap Petugas:</label>
                 <input type="text" id="newMemberName" placeholder="Contoh: Budi Santoso">
-                <button class="btn btn-primary" style="margin-top: 8px;" onclick="tambahAnggota()">➕ Tambah Anggota Baru</button>
+                <button class="btn btn-primary" style="margin-top: 8px;" onclick="tambahAnggota()">➕ Tambah Akun Baru</button>
 
                 <div style="margin-top: 12px;">
                     <b style="font-size: 11px; color: var(--text-muted);">Daftar Petugas Terdaftar:</b>
@@ -443,6 +449,26 @@
     let fotoList = [];
     let currentUserIsAdmin = false;
 
+    // Sinkronisasi data awal menggunakan localStorage browser lintas-sesi yang diperkuat
+    function getDatabaseUser() {
+        let savedUsers = localStorage.getItem('mitra10_users_v2');
+        if(savedUsers) {
+            return JSON.parse(savedUsers);
+        } else {
+            let defaultUsers = {
+                "admin": { pass: "komandan123", role: "Admin / Komandan", name: "Komandan Jaga", isAdmin: true },
+                "shodik": { pass: "patroli123", role: "Anggota / Petugas", name: "Shodik", isAdmin: false },
+                "muri": { pass: "patroli123", role: "Anggota / Petugas", name: "Muri", isAdmin: false }
+            };
+            localStorage.setItem('mitra10_users_v2', JSON.stringify(defaultUsers));
+            return defaultUsers;
+        }
+    }
+
+    function saveDatabaseUser(db) {
+        localStorage.setItem('mitra10_users_v2', JSON.stringify(db));
+    }
+
     function prosesFoto(input) {
         if (input.files && input.files[0]) {
             if (fotoList.length >= 6) {
@@ -482,25 +508,6 @@
     function resetFoto() {
         fotoList = [];
         renderGridFoto();
-    }
-
-    function getDatabaseUser() {
-        let savedUsers = localStorage.getItem('mitra10_users');
-        if(savedUsers) {
-            return JSON.parse(savedUsers);
-        } else {
-            let defaultUsers = {
-                "admin": { pass: "komandan123", role: "Admin / Komandan", name: "Komandan Jaga", isAdmin: true },
-                "shodik": { pass: "patroli123", role: "Anggota / Petugas", name: "Shodik", isAdmin: false },
-                "muri": { pass: "patroli123", role: "Anggota / Petugas", name: "Muri", isAdmin: false }
-            };
-            localStorage.setItem('mitra10_users', JSON.stringify(defaultUsers));
-            return defaultUsers;
-        }
-    }
-
-    function saveDatabaseUser(db) {
-        localStorage.setItem('mitra10_users', JSON.stringify(db));
     }
 
     function prosesLogin() {
@@ -563,7 +570,7 @@
 
         databaseUser[uNew] = { pass: pNew, role: "Anggota / Petugas", name: nNew, isAdmin: false };
         saveDatabaseUser(databaseUser);
-        alert(`Berhasil menambahkan: ${nNew}`);
+        alert(`Berhasil menambahkan akun: ${nNew}`);
 
         document.getElementById('newMemberUser').value = '';
         document.getElementById('newMemberPass').value = '';
@@ -633,9 +640,9 @@
                     situasi: situasi
                 };
 
-                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat')) || [];
+                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v2')) || [];
                 riwayatList.push(dataScanBaru);
-                localStorage.setItem('mitra10_scan_riwayat', JSON.stringify(riwayatList));
+                localStorage.setItem('mitra10_scan_riwayat_v2', JSON.stringify(riwayatList));
 
                 if(currentUserIsAdmin) {
                     muatRiwayatLokal();
@@ -660,7 +667,6 @@
         ta.value += `* ${teks}`;
     }
 
-    // FUNGSI GABUNGAN: MENGIRIM TEKS LAPORAN DAN MEMBAGIKAN/MENYIMPAN FOTO KOLASE KE WA
     function kirimLaporanDanKolaseWA() {
         let pjm1 = document.getElementById('pjm1').value || "-";
         let pjm2 = document.getElementById('pjm2').value || "-";
@@ -680,7 +686,6 @@
             return;
         }
 
-        // 1. Kirim teks laporan ke WhatsApp
         let pesan = `*REPORT PATROLI MALAM*%0A%0A` +
                     `Site         : Mitra 10 KHI%0A` +
                     `Hari         : ${hari}%0A` +
@@ -698,7 +703,6 @@
         let waUrl = `https://api.whatsapp.com/send?text=${pesan}`;
         window.open(waUrl, '_blank');
 
-        // 2. Jika ada foto, proses kolase dan bagikan/unduh file gambarnya
         if (fotoList.length > 0) {
             let canvas = document.getElementById('collageCanvas');
             let ctx = canvas.getContext('2d');
@@ -723,7 +727,6 @@
             canvas.toBlob(async (blob) => {
                 let file = new File([blob], "kolase-patroli-mitra10.png", { type: "image/png" });
 
-                // Otomatis simpan/unduh file ke perangkat HP
                 let link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = `Kolase_Patroli_${Date.now()}.png`;
@@ -731,7 +734,6 @@
                 link.click();
                 document.body.removeChild(link);
 
-                // Jika perangkat mendukung Web Share API, langsung bagikan file gambar
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
                         await navigator.share({
@@ -751,7 +753,7 @@
         if(!currentUserIsAdmin) return;
         
         const tbody = document.getElementById('historyTableBody');
-        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat')) || [];
+        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v2')) || [];
 
         if (riwayatList.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888;">Belum ada riwayat scan tersimpan.</td></tr>';
@@ -775,7 +777,7 @@
 
     function hapusSemuaRiwayat() {
         if(confirm("Yakin ingin menghapus seluruh riwayat scan barcode di perangkat ini?")) {
-            localStorage.removeItem('mitra10_scan_riwayat');
+            localStorage.removeItem('mitra10_scan_riwayat_v2');
             muatRiwayatLokal();
             alert("Riwayat scan berhasil dibersihkan.");
         }
