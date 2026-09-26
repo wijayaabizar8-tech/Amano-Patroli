@@ -147,6 +147,7 @@
         .btn-secondary { background: #64748b; color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-camera { background: #0284c7; color: white; }
+        .btn-warning { background: #d97706; color: white; }
 
         .quick-btn-grid {
             display: flex;
@@ -202,6 +203,11 @@
             border-radius: 6px;
             margin-top: 6px;
             font-size: 12px;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 4px;
         }
 
         #loginPage { display: block; }
@@ -344,7 +350,7 @@
 
                 <div style="margin-top: 12px;">
                     <b style="font-size: 11px; color: var(--text-muted);">Daftar Petugas Terdaftar:</b>
-                    <div id="containerMemberList" style="max-height: 150px; overflow-y: auto; margin-top: 4px;"></div>
+                    <div id="containerMemberList" style="max-height: 180px; overflow-y: auto; margin-top: 4px;"></div>
                 </div>
             </div>
         </div>
@@ -443,9 +449,9 @@
     let fotoList = [];
     let currentUserIsAdmin = false;
 
-    // Database akun tersentralisasi dengan akun bawaan (Admin, Shodik, Muri, Arnol)
+    // Database akun tersentralisasi dengan akun Admin, Shodik, Muri, Arnol
     function getDatabaseUser() {
-        let savedUsers = localStorage.getItem('mitra10_users_v4');
+        let savedUsers = localStorage.getItem('mitra10_users_v5');
         if(savedUsers) {
             return JSON.parse(savedUsers);
         } else {
@@ -455,13 +461,13 @@
                 "muri": { pass: "Mri", role: "Anggota / Petugas", name: "Muri", isAdmin: false },
                 "arnol": { pass: "Arl", role: "Anggota / Petugas", name: "Arnol", isAdmin: false }
             };
-            localStorage.setItem('mitra10_users_v4', JSON.stringify(defaultUsers));
+            localStorage.setItem('mitra10_users_v5', JSON.stringify(defaultUsers));
             return defaultUsers;
         }
     }
 
     function saveDatabaseUser(db) {
-        localStorage.setItem('mitra10_users_v4', JSON.stringify(db));
+        localStorage.setItem('mitra10_users_v5', JSON.stringify(db));
     }
 
     function prosesFoto(input) {
@@ -573,8 +579,25 @@
         renderMemberList();
     }
 
+    function gantiPasswordAnggota(username) {
+        let databaseUser = getDatabaseUser();
+        if(!databaseUser[username]) return;
+
+        let passBaru = prompt(`Masukkan password baru untuk akun (${username}):`);
+        if(passBaru !== null) {
+            passBaru = passBaru.trim();
+            if(passBaru === "") {
+                alert("Password tidak boleh kosong!");
+                return;
+            }
+            databaseUser[username].pass = passBaru;
+            saveDatabaseUser(databaseUser);
+            alert(`Password untuk akun "${username}" berhasil diubah!`);
+        }
+    }
+
     function hapusAnggota(username) {
-        if(confirm(`Hapus akun ${username}?`)) {
+        if(confirm(`Yakin ingin menghapus akun ${username}?`)) {
             let databaseUser = getDatabaseUser();
             delete databaseUser[username];
             saveDatabaseUser(databaseUser);
@@ -593,7 +616,10 @@
                 item.className = 'member-list-item';
                 item.innerHTML = `
                     <span><b>${databaseUser[key].name}</b> (${key})</span>
-                    <button class="btn btn-danger" style="width: auto; padding: 4px 8px; font-size: 11px; margin: 0;" onclick="hapusAnggota('${key}')">Hapus</button>
+                    <div class="member-actions">
+                        <button class="btn btn-warning" style="width: auto; padding: 4px 8px; font-size: 11px; margin: 0;" onclick="gantiPasswordAnggota('${key}')">🔑 Ganti Pass</button>
+                        <button class="btn btn-danger" style="width: auto; padding: 4px 8px; font-size: 11px; margin: 0;" onclick="hapusAnggota('${key}')">Hapus</button>
+                    </div>
                 `;
                 container.appendChild(item);
             }
@@ -635,9 +661,9 @@
                     situasi: situasi
                 };
 
-                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v4')) || [];
+                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v5')) || [];
                 riwayatList.push(dataScanBaru);
-                localStorage.setItem('mitra10_scan_riwayat_v4', JSON.stringify(riwayatList));
+                localStorage.setItem('mitra10_scan_riwayat_v5', JSON.stringify(riwayatList));
 
                 if(currentUserIsAdmin) {
                     muatRiwayatLokal();
@@ -748,7 +774,7 @@
         if(!currentUserIsAdmin) return;
         
         const tbody = document.getElementById('historyTableBody');
-        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v4')) || [];
+        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v5')) || [];
 
         if (riwayatList.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888;">Belum ada riwayat scan tersimpan.</td></tr>';
@@ -772,7 +798,7 @@
 
     function hapusSemuaRiwayat() {
         if(confirm("Yakin ingin menghapus seluruh riwayat scan barcode di perangkat ini?")) {
-            localStorage.removeItem('mitra10_scan_riwayat_v4');
+            localStorage.removeItem('mitra10_scan_riwayat_v5');
             muatRiwayatLokal();
             alert("Riwayat scan berhasil dibersihkan.");
         }
