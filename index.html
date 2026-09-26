@@ -16,7 +16,7 @@
             --accent: #25D366;
             --warning: #ff9800;
             --danger: #e53935;
-            --card-bg: rgba(255, 255, 255, 0.92); /* Background card sedikit transparan agar gambar One Piece terlihat elegan */
+            --card-bg: rgba(255, 255, 255, 0.94);
             --text-main: #2b2b2b;
             --text-muted: #555555;
             --border-radius: 14px;
@@ -24,7 +24,6 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            /* BACKGROUND FOTO ONE PIECE (Tema Malam / Bajak Laut) */
             background: linear-gradient(rgba(11, 42, 91, 0.75), rgba(15, 23, 42, 0.85)), 
                         url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
@@ -57,7 +56,6 @@
             font-size: 20px;
             font-weight: 700;
             margin: 0 0 5px 0;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .subtitle {
@@ -148,6 +146,7 @@
         .btn-scan { background: var(--warning); color: white; }
         .btn-secondary { background: #64748b; color: white; }
         .btn-danger { background: var(--danger); color: white; }
+        .btn-camera { background: #0284c7; color: white; }
 
         .quick-btn-grid {
             display: flex;
@@ -228,7 +227,39 @@
             margin-bottom: 10px;
         }
 
-        /* Styling Tabel Riwayat Laporan */
+        /* Styling Grid Kolase Foto Dokumentasi (Maksimal 6 Foto) */
+        .photo-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .photo-slot {
+            aspect-ratio: 1;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-slot span {
+            font-size: 10px;
+            color: #94a3b8;
+            text-align: center;
+            padding: 4px;
+        }
+
         .history-table {
             width: 100%;
             border-collapse: collapse;
@@ -319,7 +350,7 @@
             </div>
         </div>
 
-        <!-- SCAN BARCODE (OTOMATIS SIMPAN KE INTERNAL HP SAAT SCAN BERHASIL) -->
+        <!-- SCAN BARCODE -->
         <div class="card" style="border-color: #fde68a; background: rgba(255, 253, 249, 0.95);">
             <div class="card-title" style="color: #b45309;">📷 Scan Barcode Lapangan</div>
             <button class="btn btn-scan" onclick="startScanner()">Buka Kamera Scanner</button>
@@ -330,15 +361,15 @@
             <input type="text" id="lastCheck" readonly style="background:#f1f5f9; font-weight:600; color:var(--primary);" value="Belum ada checkpoint yang di-scan">
         </div>
 
-        <!-- FORM LAPORAN -->
+        <!-- FORM LAPORAN & DOKUMENTASI KOLASE 6 FOTO -->
         <div class="card card-highlight">
-            <div class="card-title" style="color: #166534;">📝 Form Laporan Patroli Malam</div>
+            <div class="card-title" style="color: #166534;">📝 Form Laporan & Dokumentasi</div>
             
             <label>Nama Petugas 1 (PJM 1):</label>
-            <input type="text" id="pjm1" placeholder="Masukkan nama PJM 1 (Contoh: Shodik)">
+            <input type="text" id="pjm1" placeholder="Masukkan nama PJM 1">
 
             <label>Nama Petugas 2 (PJM 2):</label>
-            <input type="text" id="pjm2" placeholder="Masukkan nama PJM 2 (Contoh: Muri)">
+            <input type="text" id="pjm2" placeholder="Masukkan nama PJM 2">
 
             <label>Pilih Cepat Kegiatan (Action):</label>
             <div class="quick-btn-grid">
@@ -349,7 +380,7 @@
             </div>
 
             <label>Rincian Kegiatan (Action):</label>
-            <textarea id="action" rows="5" placeholder="Pilih tombol di atas atau ketik rincian kegiatan..."></textarea>
+            <textarea id="action" rows="4" placeholder="Pilih tombol di atas atau ketik rincian kegiatan..."></textarea>
 
             <label>Situasi Akhir Patroli:</label>
             <select id="situasi">
@@ -358,11 +389,28 @@
                 <option>Situasi hujan deras - Patroli terbatas</option>
             </select>
 
-            <button class="btn btn-wa" onclick="kirimWA()">📱 Kirim Laporan Sesuai Format WA</button>
+            <!-- Bagian Kamera Dokumentasi Kolase (Max 6 Foto) -->
+            <label style="margin-top: 15px;">📸 Dokumentasi Foto Patroli (Maksimal 6 Foto):</label>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="prosesFoto(this)">
+            <button class="btn btn-camera" onclick="document.getElementById('cameraInput').click()">📸 Ambil Foto Dokumentasi</button>
+            
+            <!-- Grid Kolase 6 Foto -->
+            <div class="photo-preview-grid" id="photoGrid">
+                <div class="photo-slot"><span>Foto 1</span></div>
+                <div class="photo-slot"><span>Foto 2</span></div>
+                <div class="photo-slot"><span>Foto 3</span></div>
+                <div class="photo-slot"><span>Foto 4</span></div>
+                <div class="photo-slot"><span>Foto 5</span></div>
+                <div class="photo-slot"><span>Foto 6</span></div>
+            </div>
+            <button class="btn btn-danger" style="font-size:11px; padding:6px; margin-top:6px;" onclick="resetFoto()">🗑️ Reset Semua Foto</button>
+
+            <!-- Tombol Kirim Gabungan Text & Foto -->
+            <button class="btn btn-wa" style="margin-top: 15px;" onclick="kirimWADenganFoto()">📱 Kirim Laporan & Foto ke WhatsApp</button>
             <button class="btn btn-secondary" onclick="resetForm()">🗑️ Hapus & Isi Ulang</button>
         </div>
 
-        <!-- RIWAYAT HASIL SCAN BARCODE DI HP -->
+        <!-- RIWAYAT HASIL SCAN BARCODE -->
         <div class="card" style="border-color: #cbd5e1;">
             <div class="card-title">📊 Riwayat Hasil Scan Barcode (Internal HP)</div>
             <button class="btn btn-primary" onclick="muatRiwayatLokal()">🔄 Perbarui / Muat Riwayat</button>
@@ -390,6 +438,45 @@
 </div>
 
 <script>
+    let fotoList = [];
+
+    function prosesFoto(input) {
+        if (input.files && input.files[0]) {
+            if (fotoList.length >= 6) {
+                alert("Maksimal pengambilan foto adalah 6 dokumentasi!");
+                return;
+            }
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                fotoList.push(e.target.result);
+                renderGridFoto();
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+        input.value = ''; // Reset input
+    }
+
+    function renderGridFoto() {
+        let slots = document.querySelectorAll('.photo-slot');
+        slots.forEach((slot, index) => {
+            slot.innerHTML = '';
+            if (fotoList[index]) {
+                let img = document.createElement('img');
+                img.src = fotoList[index];
+                slot.appendChild(img);
+            } else {
+                let span = document.createElement('span');
+                span.innerText = `Foto ${index + 1}`;
+                slot.appendChild(span);
+            }
+        });
+    }
+
+    function resetFoto() {
+        fotoList = [];
+        renderGridFoto();
+    }
+
     function getDatabaseUser() {
         let savedUsers = localStorage.getItem('mitra10_users');
         if(savedUsers) {
@@ -524,7 +611,6 @@
                 tambahAction(`Pengecekan ${decodedText} pada pukul ${waktuStr} WIB`);
                 stopScanner();
 
-                // OTOMATIS SIMPAN KE INTERNAL TELEPON (LOCALSTORAGE) SAAT SCAN BERHASIL
                 let pjm1 = document.getElementById('pjm1').value || "-";
                 let pjm2 = document.getElementById('pjm2').value || "-";
                 let situasi = document.getElementById('situasi').value;
@@ -561,8 +647,8 @@
         ta.value += `* ${teks}`;
     }
 
-    // FUNGSI KIRIM LAPORAN KE WHATSAPP
-    function kirimWA() {
+    // FUNGSI KIRIM LAPORAN KE WHATSAPP (BESERTA CATATAN JUMLAH FOTO DOKUMENTASI)
+    function kirimWADenganFoto() {
         let pjm1 = document.getElementById('pjm1').value || "-";
         let pjm2 = document.getElementById('pjm2').value || "-";
         let action = document.getElementById('action').value;
@@ -575,7 +661,6 @@
         let mm = String(now.getMonth() + 1).padStart(2, '0');
         let yyyy = now.getFullYear();
         let tanggal = `${dd}-${mm}-${yyyy}`;
-
         let waktu = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " Wib";
 
         if(!action) {
@@ -591,7 +676,8 @@
                     `PJM 1.    : ${pjm1}%0A` +
                     `PJM 2.    : ${pjm2}%0A%0A` +
                     `Rincian kegiatan ( action ) :%0A%0A` +
-                    `${encodeURIComponent(action)}%0A%0A%0A` +
+                    `${encodeURIComponent(action)}%0A%0A` +
+                    `📷 *Dokumentasi Terlampir:* ${fotoList.length} Foto Kolase%0A%0A` +
                     `*${situasi}*%0A%0A` +
                     `*Salam Siaga 24 jam*%0A` +
                     `*Zero ACCIDENT*%0A` +
@@ -599,9 +685,12 @@
 
         let waUrl = `https://api.whatsapp.com/send?text=${pesan}`;
         window.open(waUrl, '_blank');
+        
+        if(fotoList.length > 0) {
+            alert(`Catatan: Teks laporan siap dikirim via WhatsApp. Karena keterbatasan browser HP, Anda dapat melampirkan file foto dokumentasi dari galeri HP Anda secara terpisah jika diperlukan.`);
+        }
     }
 
-    // FUNGSI UNTUK MENARIK DATA SCAN DARI INTERNAL TELEPON KE TABEL
     function muatRiwayatLokal() {
         const tbody = document.getElementById('historyTableBody');
         let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat')) || [];
@@ -637,6 +726,7 @@
     function resetForm() {
         document.getElementById('action').value = '';
         document.getElementById('lastCheck').value = 'Belum ada checkpoint yang di-scan';
+        resetFoto();
     }
 </script>
 
