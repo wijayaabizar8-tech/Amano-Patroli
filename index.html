@@ -147,7 +147,6 @@
         .btn-secondary { background: #64748b; color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-camera { background: #0284c7; color: white; }
-        .btn-share { background: #0ea5e9; color: white; }
 
         .quick-btn-grid {
             display: flex;
@@ -405,9 +404,8 @@
             </div>
             <button class="btn btn-danger" style="font-size:11px; padding:6px; margin-top:6px;" onclick="resetFoto()">🗑️ Reset Semua Foto</button>
 
-            <!-- Tombol Kirim & Bagikan -->
-            <button class="btn btn-wa" style="margin-top: 15px;" onclick="kirimLaporanTeksWA()">📱 Kirim Laporan Teks ke WA</button>
-            <button class="btn btn-share" onclick="bagikanFotoKolaseWA()">📤 Bagikan File Foto Kolase ke WA (Langsung)</button>
+            <!-- Tombol Gabungan Kirim Teks & Bagikan Foto Kolase ke WA -->
+            <button class="btn btn-wa" style="margin-top: 15px;" onclick="kirimLaporanDanKolaseWA()">📱 Kirim Laporan & Bagikan Foto ke WA</button>
             <button class="btn btn-secondary" onclick="resetForm()">🗑️ Hapus & Isi Ulang</button>
         </div>
 
@@ -662,7 +660,8 @@
         ta.value += `* ${teks}`;
     }
 
-    function kirimLaporanTeksWA() {
+    // FUNGSI GABUNGAN: MENGIRIM TEKS LAPORAN DAN MEMBAGIKAN/MENYIMPAN FOTO KOLASE KE WA
+    function kirimLaporanDanKolaseWA() {
         let pjm1 = document.getElementById('pjm1').value || "-";
         let pjm2 = document.getElementById('pjm2').value || "-";
         let action = document.getElementById('action').value;
@@ -681,6 +680,7 @@
             return;
         }
 
+        // 1. Kirim teks laporan ke WhatsApp
         let pesan = `*REPORT PATROLI MALAM*%0A%0A` +
                     `Site         : Mitra 10 KHI%0A` +
                     `Hari         : ${hari}%0A` +
@@ -697,61 +697,54 @@
 
         let waUrl = `https://api.whatsapp.com/send?text=${pesan}`;
         window.open(waUrl, '_blank');
-    }
 
-    // FUNGSI MEMBUAT KOLASE & MEMBAGIKAN FILE GAMBAR LANGSUNG KE WHATSAPP / GALERI
-    function bagikanFotoKolaseWA() {
-        if (fotoList.length === 0) {
-            alert("Belum ada foto dokumentasi yang diambil!");
-            return;
-        }
+        // 2. Jika ada foto, proses kolase dan bagikan/unduh file gambarnya
+        if (fotoList.length > 0) {
+            let canvas = document.getElementById('collageCanvas');
+            let ctx = canvas.getContext('2d');
+            
+            let cols = 2;
+            let rows = Math.ceil(fotoList.length / cols);
+            let thumbW = 500;
+            let thumbH = 500;
+            
+            canvas.width = cols * thumbW;
+            canvas.height = rows * thumbH;
+            
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        let canvas = document.getElementById('collageCanvas');
-        let ctx = canvas.getContext('2d');
-        
-        let cols = 2;
-        let rows = Math.ceil(fotoList.length / cols);
-        let thumbW = 500;
-        let thumbH = 500;
-        
-        canvas.width = cols * thumbW;
-        canvas.height = rows * thumbH;
-        
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        for (let i = 0; i < fotoList.length; i++) {
-            let x = (i % cols) * thumbW;
-            let y = Math.floor(i / cols) * thumbH;
-            ctx.drawImage(fotoList[i], x, y, thumbW, thumbH);
-        }
-
-        canvas.toBlob(async (blob) => {
-            let file = new File([blob], "kolase-patroli-mitra10.png", { type: "image/png" });
-
-            // Otomatis simpan/unduh file ke perangkat HP
-            let link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Kolase_Patroli_${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Jika perangkat mendukung Web Share API, langsung bagikan file gambar ke WhatsApp
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Dokumentasi Kolase Patroli',
-                        text: 'Dokumentasi Foto Kolase Patroli Malam Mitra10 KHI'
-                    });
-                } catch (error) {
-                    console.log('Share dibatalkan', error);
-                }
-            } else {
-                alert("✅ Foto kolase berhasil digabungkan dan disimpan otomatis ke galeri/unduhan HP Anda! Silakan lampirkan dari galeri saat chat WhatsApp.");
+            for (let i = 0; i < fotoList.length; i++) {
+                let x = (i % cols) * thumbW;
+                let y = Math.floor(i / cols) * thumbH;
+                ctx.drawImage(fotoList[i], x, y, thumbW, thumbH);
             }
-        }, "image/png");
+
+            canvas.toBlob(async (blob) => {
+                let file = new File([blob], "kolase-patroli-mitra10.png", { type: "image/png" });
+
+                // Otomatis simpan/unduh file ke perangkat HP
+                let link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `Kolase_Patroli_${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Jika perangkat mendukung Web Share API, langsung bagikan file gambar
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Dokumentasi Kolase Patroli',
+                            text: 'Dokumentasi Foto Kolase Patroli Malam Mitra10 KHI'
+                        });
+                    } catch (error) {
+                        console.log('Share dibatalkan', error);
+                    }
+                }
+            }, "image/png");
+        }
     }
 
     function muatRiwayatLokal() {
