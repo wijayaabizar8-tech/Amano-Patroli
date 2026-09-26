@@ -147,6 +147,7 @@
         .btn-secondary { background: #64748b; color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-camera { background: #0284c7; color: white; }
+        .btn-share { background: #0ea5e9; color: white; }
 
         .quick-btn-grid {
             display: flex;
@@ -227,7 +228,6 @@
             margin-bottom: 10px;
         }
 
-        /* Styling Grid Kolase Foto Dokumentasi (Maksimal 6 Foto) */
         .photo-preview-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -363,7 +363,7 @@
 
         <!-- FORM LAPORAN & DOKUMENTASI KOLASE 6 FOTO -->
         <div class="card card-highlight">
-            <div class="card-title" style="color: #166534;">📝 Form Laporan & Dokumentasi</div>
+            <div class="card-title" style="color: #166534;">📝 Form Laporan & Dokumentasi Kolase</div>
             
             <label>Nama Petugas 1 (PJM 1):</label>
             <input type="text" id="pjm1" placeholder="Masukkan nama PJM 1">
@@ -405,14 +405,15 @@
             </div>
             <button class="btn btn-danger" style="font-size:11px; padding:6px; margin-top:6px;" onclick="resetFoto()">🗑️ Reset Semua Foto</button>
 
-            <!-- Tombol Kirim Gabungan Text & Foto -->
-            <button class="btn btn-wa" style="margin-top: 15px;" onclick="kirimWADenganFoto()">📱 Kirim Laporan & Foto ke WhatsApp</button>
+            <!-- Tombol Kirim & Bagikan -->
+            <button class="btn btn-wa" style="margin-top: 15px;" onclick="kirimLaporanTeksWA()">📱 Kirim Laporan Teks ke WA</button>
+            <button class="btn btn-share" onclick="bagikanFotoKolaseWA()">📤 Bagikan File Foto Kolase ke WA (Langsung)</button>
             <button class="btn btn-secondary" onclick="resetForm()">🗑️ Hapus & Isi Ulang</button>
         </div>
 
-        <!-- RIWAYAT HASIL SCAN BARCODE -->
-        <div class="card" style="border-color: #cbd5e1;">
-            <div class="card-title">📊 Riwayat Hasil Scan Barcode (Internal HP)</div>
+        <!-- RIWAYAT HASIL SCAN BARCODE (KHUSUS ADMIN) -->
+        <div class="card" id="adminScanHistoryCard" style="border-color: #cbd5e1; display: none;">
+            <div class="card-title">📊 Riwayat Hasil Scan Barcode (Khusus Admin)</div>
             <button class="btn btn-primary" onclick="muatRiwayatLokal()">🔄 Perbarui / Muat Riwayat</button>
             <button class="btn btn-danger" onclick="hapusSemuaRiwayat()" style="margin-top: 6px;">🗑️ Hapus Semua Riwayat</button>
             
@@ -437,8 +438,12 @@
     </div>
 </div>
 
+<!-- Canvas Tersembunyi untuk Pembuatan Kolase Foto -->
+<canvas id="collageCanvas" style="display:none;"></canvas>
+
 <script>
     let fotoList = [];
+    let currentUserIsAdmin = false;
 
     function prosesFoto(input) {
         if (input.files && input.files[0]) {
@@ -448,12 +453,16 @@
             }
             let reader = new FileReader();
             reader.onload = function(e) {
-                fotoList.push(e.target.result);
-                renderGridFoto();
+                let imgObj = new Image();
+                imgObj.src = e.target.result;
+                imgObj.onload = function() {
+                    fotoList.push(imgObj);
+                    renderGridFoto();
+                }
             }
             reader.readAsDataURL(input.files[0]);
         }
-        input.value = ''; // Reset input
+        input.value = '';
     }
 
     function renderGridFoto() {
@@ -462,7 +471,7 @@
             slot.innerHTML = '';
             if (fotoList[index]) {
                 let img = document.createElement('img');
-                img.src = fotoList[index];
+                img.src = fotoList[index].src;
                 slot.appendChild(img);
             } else {
                 let span = document.createElement('span');
@@ -508,26 +517,30 @@
 
         if(databaseUser[uInput] && databaseUser[uInput].pass === pInput) {
             let user = databaseUser[uInput];
+            currentUserIsAdmin = user.isAdmin;
 
             document.getElementById('pjm1').value = user.name;
             document.getElementById('userInfoBadge').innerText = `Login: ${user.name} (${user.role})`;
 
             if(user.isAdmin) {
                 document.getElementById('adminControlPanel').style.display = 'block';
+                document.getElementById('adminScanHistoryCard').style.display = 'block';
                 renderMemberList();
+                muatRiwayatLokal();
             } else {
                 document.getElementById('adminControlPanel').style.display = 'none';
+                document.getElementById('adminScanHistoryCard').style.display = 'none';
             }
 
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('appPage').style.display = 'block';
-            muatRiwayatLokal(); 
         } else {
             alert('Username atau Password salah!');
         }
     }
 
     function logout() {
+        currentUserIsAdmin = false;
         document.getElementById('loginUser').value = '';
         document.getElementById('loginPass').value = '';
         document.getElementById('loginPage').style.display = 'block';
@@ -626,7 +639,9 @@
                 riwayatList.push(dataScanBaru);
                 localStorage.setItem('mitra10_scan_riwayat', JSON.stringify(riwayatList));
 
-                muatRiwayatLokal();
+                if(currentUserIsAdmin) {
+                    muatRiwayatLokal();
+                }
                 alert("Berhasil Scan & Data Tersimpan: " + decodedText);
             }
         ).catch((err) => { alert("Gagal buka kamera: " + err); });
@@ -647,8 +662,7 @@
         ta.value += `* ${teks}`;
     }
 
-    // FUNGSI KIRIM LAPORAN KE WHATSAPP (BESERTA CATATAN JUMLAH FOTO DOKUMENTASI)
-    function kirimWADenganFoto() {
+    function kirimLaporanTeksWA() {
         let pjm1 = document.getElementById('pjm1').value || "-";
         let pjm2 = document.getElementById('pjm2').value || "-";
         let action = document.getElementById('action').value;
@@ -656,7 +670,6 @@
 
         let now = new Date();
         let hari = now.toLocaleDateString('id-ID', { weekday: 'long' });
-        
         let dd = String(now.getDate()).padStart(2, '0');
         let mm = String(now.getMonth() + 1).padStart(2, '0');
         let yyyy = now.getFullYear();
@@ -677,7 +690,6 @@
                     `PJM 2.    : ${pjm2}%0A%0A` +
                     `Rincian kegiatan ( action ) :%0A%0A` +
                     `${encodeURIComponent(action)}%0A%0A` +
-                    `📷 *Dokumentasi Terlampir:* ${fotoList.length} Foto Kolase%0A%0A` +
                     `*${situasi}*%0A%0A` +
                     `*Salam Siaga 24 jam*%0A` +
                     `*Zero ACCIDENT*%0A` +
@@ -685,13 +697,66 @@
 
         let waUrl = `https://api.whatsapp.com/send?text=${pesan}`;
         window.open(waUrl, '_blank');
-        
-        if(fotoList.length > 0) {
-            alert(`Catatan: Teks laporan siap dikirim via WhatsApp. Karena keterbatasan browser HP, Anda dapat melampirkan file foto dokumentasi dari galeri HP Anda secara terpisah jika diperlukan.`);
+    }
+
+    // FUNGSI MEMBUAT KOLASE & MEMBAGIKAN FILE GAMBAR LANGSUNG KE WHATSAPP / GALERI
+    function bagikanFotoKolaseWA() {
+        if (fotoList.length === 0) {
+            alert("Belum ada foto dokumentasi yang diambil!");
+            return;
         }
+
+        let canvas = document.getElementById('collageCanvas');
+        let ctx = canvas.getContext('2d');
+        
+        let cols = 2;
+        let rows = Math.ceil(fotoList.length / cols);
+        let thumbW = 500;
+        let thumbH = 500;
+        
+        canvas.width = cols * thumbW;
+        canvas.height = rows * thumbH;
+        
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < fotoList.length; i++) {
+            let x = (i % cols) * thumbW;
+            let y = Math.floor(i / cols) * thumbH;
+            ctx.drawImage(fotoList[i], x, y, thumbW, thumbH);
+        }
+
+        canvas.toBlob(async (blob) => {
+            let file = new File([blob], "kolase-patroli-mitra10.png", { type: "image/png" });
+
+            // Otomatis simpan/unduh file ke perangkat HP
+            let link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Kolase_Patroli_${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Jika perangkat mendukung Web Share API, langsung bagikan file gambar ke WhatsApp
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Dokumentasi Kolase Patroli',
+                        text: 'Dokumentasi Foto Kolase Patroli Malam Mitra10 KHI'
+                    });
+                } catch (error) {
+                    console.log('Share dibatalkan', error);
+                }
+            } else {
+                alert("✅ Foto kolase berhasil digabungkan dan disimpan otomatis ke galeri/unduhan HP Anda! Silakan lampirkan dari galeri saat chat WhatsApp.");
+            }
+        }, "image/png");
     }
 
     function muatRiwayatLokal() {
+        if(!currentUserIsAdmin) return;
+        
         const tbody = document.getElementById('historyTableBody');
         let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat')) || [];
 
