@@ -1,4 +1,4 @@
-       <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -16,60 +16,68 @@
             --accent: #25D366;
             --warning: #ff9800;
             --danger: #e53935;
-            --bg-color: #f4f7fc;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --border-radius: 12px;
+            --card-bg: rgba(255, 255, 255, 0.92); /* Background card sedikit transparan agar gambar One Piece terlihat elegan */
+            --text-main: #2b2b2b;
+            --text-muted: #555555;
+            --border-radius: 14px;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-color);
+            /* BACKGROUND FOTO ONE PIECE (Tema Malam / Bajak Laut) */
+            background: linear-gradient(rgba(11, 42, 91, 0.75), rgba(15, 23, 42, 0.85)), 
+                        url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
             margin: 0;
             padding: 12px;
             color: var(--text-main);
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 550px;
+            max-width: 600px;
             margin: auto;
             background: var(--card-bg);
+            backdrop-filter: blur(10px);
             padding: 20px;
             border-radius: var(--border-radius);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .header-box {
             text-align: center;
-            border-bottom: 2px solid #edf2f7;
+            border-bottom: 2px solid #cbd5e1;
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
 
         h2 {
             color: var(--primary);
-            font-size: 19px;
+            font-size: 20px;
             font-weight: 700;
             margin: 0 0 5px 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .subtitle {
             font-size: 12px;
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .card {
-            background: #fafbfd;
-            border: 1px solid #e2e8f0;
+            background: rgba(250, 251, 253, 0.95);
+            border: 1px solid #cbd5e1;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
         .card-highlight {
-            background: #f0fdf4;
+            background: rgba(240, 253, 244, 0.95);
             border: 1px solid #bbf7d0;
         }
 
@@ -107,7 +115,7 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(11, 42, 91, 0.1);
+            box-shadow: 0 0 0 3px rgba(11, 42, 91, 0.15);
         }
 
         textarea {
@@ -128,6 +136,7 @@
             gap: 8px;
             transition: opacity 0.2s, transform 0.1s;
             margin-top: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .btn:active {
@@ -200,7 +209,7 @@
         #appPage { display: none; }
         
         .login-card {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 20px;
@@ -219,14 +228,28 @@
             margin-bottom: 10px;
         }
 
-        /* Styling Kolase Foto */
-        #collageCanvas {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
+        /* Styling Tabel Riwayat Laporan */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
             margin-top: 10px;
-            display: none;
+            background: #fff;
+        }
+
+        .history-table th, .history-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .history-table th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .history-table tr:nth-child(even) {
+            background-color: #f8fafc;
         }
     </style>
 </head>
@@ -234,7 +257,7 @@
 
 <div class="container">
     <div class="header-box">
-        <h2>🛡️ PATROLI MALAM</h2>
+        <h2>🏴‍☠️ PATROLI MALAM ⚓</h2>
         <div class="subtitle">MITRA 10 KOTA HARAPAN INDAH</div>
     </div>
 
@@ -258,11 +281,11 @@
     <div id="appPage">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div id="userInfoBadge" class="user-badge">Role: -</div>
-            <button onclick="logout()" style="background: none; border: none; color: var(--danger); font-weight: 600; font-size: 12px; cursor: pointer;">🚪 Logout</button>
+            <button onclick="logout()" style="background: rgba(255,255,255,0.8); border: none; color: var(--danger); font-weight: 600; font-size: 12px; cursor: pointer; padding: 4px 8px; border-radius: 6px;">🚪 Logout</button>
         </div>
 
         <!-- PANEL KONTROL ADMIN -->
-        <div class="card" id="adminControlPanel" style="display: none; border-left: 4px solid var(--primary); background: #f8fafc;">
+        <div class="card" id="adminControlPanel" style="display: none; border-left: 4px solid var(--primary); background: rgba(248, 250, 252, 0.95);">
             <div class="card-title">⚙️ Panel Kontrol Admin</div>
             <p style="font-size:11px; color:var(--text-muted); margin:0 0 10px 0;">Menu manajemen sistem khusus Admin/Komandan.</p>
             
@@ -296,8 +319,8 @@
             </div>
         </div>
 
-        <!-- SCAN BARCODE -->
-        <div class="card" style="border-color: #fde68a; background: #fffdf9;">
+        <!-- SCAN BARCODE (OTOMATIS SIMPAN KE INTERNAL HP SAAT SCAN BERHASIL) -->
+        <div class="card" style="border-color: #fde68a; background: rgba(255, 253, 249, 0.95);">
             <div class="card-title" style="color: #b45309;">📷 Scan Barcode Lapangan</div>
             <button class="btn btn-scan" onclick="startScanner()">Buka Kamera Scanner</button>
             <div id="reader"></div>
@@ -328,14 +351,6 @@
             <label>Rincian Kegiatan (Action):</label>
             <textarea id="action" rows="5" placeholder="Pilih tombol di atas atau ketik rincian kegiatan..."></textarea>
 
-            <!-- UPLOAD FOTO DOKUMENTASI & AUTOMATIC COLLAGE -->
-            <label> Upload Foto Kegiatan (Maks. 4 Foto untuk Kolase Otomatis):</label>
-            <input type="file" id="photoInput" accept="image/*" multiple onchange="generateCollage()">
-            <canvas id="collageCanvas"></canvas>
-            <a id="downloadBtn" style="display:none; text-decoration:none;" download="kolase_patroli_mitra10.jpg">
-                <button class="btn btn-secondary" style="margin-top:6px; font-size:12px;">💾 Unduh Gambar Kolase Foto</button>
-            </a>
-
             <label>Situasi Akhir Patroli:</label>
             <select id="situasi">
                 <option>Situasi aman kondusif</option>
@@ -345,6 +360,31 @@
 
             <button class="btn btn-wa" onclick="kirimWA()">📱 Kirim Laporan Sesuai Format WA</button>
             <button class="btn btn-secondary" onclick="resetForm()">🗑️ Hapus & Isi Ulang</button>
+        </div>
+
+        <!-- RIWAYAT HASIL SCAN BARCODE DI HP -->
+        <div class="card" style="border-color: #cbd5e1;">
+            <div class="card-title">📊 Riwayat Hasil Scan Barcode (Internal HP)</div>
+            <button class="btn btn-primary" onclick="muatRiwayatLokal()">🔄 Perbarui / Muat Riwayat</button>
+            <button class="btn btn-danger" onclick="hapusSemuaRiwayat()" style="margin-top: 6px;">🗑️ Hapus Semua Riwayat</button>
+            
+            <div style="overflow-x: auto; margin-top: 10px;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Waktu Scan</th>
+                            <th>Checkpoint / Barcode</th>
+                            <th>Petugas</th>
+                            <th>Situasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #888;">Belum ada data scan tersimpan.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -394,6 +434,7 @@
 
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('appPage').style.display = 'block';
+            muatRiwayatLokal(); 
         } else {
             alert('Username atau Password salah!');
         }
@@ -477,11 +518,30 @@
             { facingMode: "environment" }, 
             { fps: 10, qrbox: { width: 200, height: 200 } },
             (decodedText) => {
-                let waktu = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                document.getElementById('lastCheck').value = decodedText + " (" + waktu + ")";
-                tambahAction(`Pengecekan ${decodedText} pada pukul ${waktu} WIB`);
+                let now = new Date();
+                let waktuStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                document.getElementById('lastCheck').value = decodedText + " (" + waktuStr + ")";
+                tambahAction(`Pengecekan ${decodedText} pada pukul ${waktuStr} WIB`);
                 stopScanner();
-                alert("Berhasil Scan: " + decodedText);
+
+                // OTOMATIS SIMPAN KE INTERNAL TELEPON (LOCALSTORAGE) SAAT SCAN BERHASIL
+                let pjm1 = document.getElementById('pjm1').value || "-";
+                let pjm2 = document.getElementById('pjm2').value || "-";
+                let situasi = document.getElementById('situasi').value;
+
+                let dataScanBaru = {
+                    waktu: now.toISOString(),
+                    checkpoint: decodedText,
+                    petugas: `${pjm1} / ${pjm2}`,
+                    situasi: situasi
+                };
+
+                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat')) || [];
+                riwayatList.push(dataScanBaru);
+                localStorage.setItem('mitra10_scan_riwayat', JSON.stringify(riwayatList));
+
+                muatRiwayatLokal();
+                alert("Berhasil Scan & Data Tersimpan: " + decodedText);
             }
         ).catch((err) => { alert("Gagal buka kamera: " + err); });
     }
@@ -501,72 +561,7 @@
         ta.value += `* ${teks}`;
     }
 
-    // FUNGSI MEMBUAT KOLASE FOTO OTOMATIS
-    function generateCollage() {
-        const input = document.getElementById('photoInput');
-        const canvas = document.getElementById('collageCanvas');
-        const ctx = canvas.getContext('2d');
-        const downloadBtn = document.getElementById('downloadBtn');
-
-        if (!input.files || input.files.length === 0) return;
-
-        const files = Array.from(input.files).slice(0, 4); // Maksimal 4 foto
-        const images = [];
-        let loadedCount = 0;
-
-        files.forEach((file) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    images.push(img);
-                    loadedCount++;
-                    if (loadedCount === files.length) {
-                        drawCanvas(images);
-                    }
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        function drawCanvas(imgs) {
-            const size = 800;
-            canvas.width = size;
-            canvas.height = size;
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, size, size);
-
-            if (imgs.length === 1) {
-                ctx.drawImage(imgs[0], 0, 0, size, size);
-            } else if (imgs.length === 2) {
-                ctx.drawImage(imgs[0], 0, 0, size / 2 - 2, size);
-                ctx.drawImage(imgs[1], size / 2 + 2, 0, size / 2 - 2, size);
-            } else if (imgs.length === 3) {
-                ctx.drawImage(imgs[0], 0, 0, size / 2 - 2, size);
-                ctx.drawImage(imgs[1], size / 2 + 2, 0, size / 2 - 2, size / 2 - 2);
-                ctx.drawImage(imgs[2], size / 2 + 2, size / 2 + 2, size / 2 - 2, size / 2 - 2);
-            } else {
-                ctx.drawImage(imgs[0], 0, 0, size / 2 - 2, size / 2 - 2);
-                ctx.drawImage(imgs[1], size / 2 + 2, 0, size / 2 - 2, size / 2 - 2);
-                ctx.drawImage(imgs[2], 0, size / 2 + 2, size / 2 - 2, size / 2 - 2);
-                ctx.drawImage(imgs[3], size / 2 + 2, size / 2 + 2, size / 2 - 2, size / 2 - 2);
-            }
-
-            // Watermark Otomatis Mitra10
-            ctx.fillStyle = "rgba(11, 42, 91, 0.7)";
-            ctx.fillRect(0, size - 50, size, 50);
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 20px Inter, sans-serif";
-            ctx.fillText("DOKUMENTASI PATROLI MALAM - MITRA 10 KHI", 20, size - 18);
-
-            canvas.style.display = 'block';
-            downloadBtn.style.display = 'block';
-            downloadBtn.href = canvas.toDataURL('image/jpeg');
-        }
-    }
-
+    // FUNGSI KIRIM LAPORAN KE WHATSAPP
     function kirimWA() {
         let pjm1 = document.getElementById('pjm1').value || "-";
         let pjm2 = document.getElementById('pjm2').value || "-";
@@ -606,14 +601,44 @@
         window.open(waUrl, '_blank');
     }
 
+    // FUNGSI UNTUK MENARIK DATA SCAN DARI INTERNAL TELEPON KE TABEL
+    function muatRiwayatLokal() {
+        const tbody = document.getElementById('historyTableBody');
+        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat')) || [];
+
+        if (riwayatList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888;">Belum ada riwayat scan tersimpan.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = ''; 
+        
+        riwayatList.slice().reverse().forEach(row => {
+            let dateStr = row.waktu ? new Date(row.waktu).toLocaleString('id-ID') : '-';
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${dateStr}</td>
+                <td><b>${row.checkpoint}</b></td>
+                <td>${row.petugas}</td>
+                <td>${row.situasi}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function hapusSemuaRiwayat() {
+        if(confirm("Yakin ingin menghapus seluruh riwayat scan barcode di perangkat ini?")) {
+            localStorage.removeItem('mitra10_scan_riwayat');
+            muatRiwayatLokal();
+            alert("Riwayat scan berhasil dibersihkan.");
+        }
+    }
+
     function resetForm() {
         document.getElementById('action').value = '';
         document.getElementById('lastCheck').value = 'Belum ada checkpoint yang di-scan';
-        document.getElementById('photoInput').value = '';
-        document.getElementById('collageCanvas').style.display = 'none';
-        document.getElementById('downloadBtn').style.display = 'none';
     }
 </script>
 
 </body>
-</html>                                      
+</html>
