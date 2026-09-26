@@ -306,9 +306,9 @@
             <button class="btn btn-primary" style="margin-top: 15px;" onclick="prosesLogin()">Masuk Aplikasi</button>
             
             <div style="margin-top: 15px; font-size: 10px; color: #64748b; text-align: center; background: #f8fafc; padding: 8px; border-radius: 6px;">
-                💡 <b>Info Akun Bawaan:</b><br>
-                Admin: Username: <b>admin</b> | Pass: <b>komandan123</b><br>
-                Petugas: Username: <b>shodik</b> atau <b>muri</b> | Pass: <b>patroli123</b>
+                💡 <b>Daftar Akun Utama:</b><br>
+                Admin: <b>admin</b> / <b>komandan123</b><br>
+                Petugas: <b>shodik</b> / <b>patroli123</b> atau <b>muri</b> / <b>patroli123</b>
             </div>
         </div>
     </div>
@@ -449,9 +449,9 @@
     let fotoList = [];
     let currentUserIsAdmin = false;
 
-    // Sinkronisasi data awal menggunakan localStorage browser lintas-sesi yang diperkuat
+    // Database akun tersentralisasi di dalam kode (ubah atau tambahkan data di sini jika ingin permanen di semua HP)
     function getDatabaseUser() {
-        let savedUsers = localStorage.getItem('mitra10_users_v2');
+        let savedUsers = localStorage.getItem('mitra10_users_v3');
         if(savedUsers) {
             return JSON.parse(savedUsers);
         } else {
@@ -460,13 +460,13 @@
                 "shodik": { pass: "patroli123", role: "Anggota / Petugas", name: "Shodik", isAdmin: false },
                 "muri": { pass: "patroli123", role: "Anggota / Petugas", name: "Muri", isAdmin: false }
             };
-            localStorage.setItem('mitra10_users_v2', JSON.stringify(defaultUsers));
+            localStorage.setItem('mitra10_users_v3', JSON.stringify(defaultUsers));
             return defaultUsers;
         }
     }
 
     function saveDatabaseUser(db) {
-        localStorage.setItem('mitra10_users_v2', JSON.stringify(db));
+        localStorage.setItem('mitra10_users_v3', JSON.stringify(db));
     }
 
     function prosesFoto(input) {
@@ -570,7 +570,7 @@
 
         databaseUser[uNew] = { pass: pNew, role: "Anggota / Petugas", name: nNew, isAdmin: false };
         saveDatabaseUser(databaseUser);
-        alert(`Berhasil menambahkan akun: ${nNew}`);
+        alert(`Berhasil menambahkan akun: ${nNew}\n\nCatatan: Karena menggunakan GitHub Pages statis, agar akun ini bisa aktif di HP lain secara permanen, pastikan username & password tersebut juga ditambahkan ke dalam skrip kode utama Anda.`);
 
         document.getElementById('newMemberUser').value = '';
         document.getElementById('newMemberPass').value = '';
@@ -640,9 +640,9 @@
                     situasi: situasi
                 };
 
-                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v2')) || [];
+                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v3')) || [];
                 riwayatList.push(dataScanBaru);
-                localStorage.setItem('mitra10_scan_riwayat_v2', JSON.stringify(riwayatList));
+                localStorage.setItem('mitra10_scan_riwayat_v3', JSON.stringify(riwayatList));
 
                 if(currentUserIsAdmin) {
                     muatRiwayatLokal();
@@ -753,7 +753,7 @@
         if(!currentUserIsAdmin) return;
         
         const tbody = document.getElementById('historyTableBody');
-        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v2')) || [];
+        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v3')) || [];
 
         if (riwayatList.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888;">Belum ada riwayat scan tersimpan.</td></tr>';
@@ -777,7 +777,7 @@
 
     function hapusSemuaRiwayat() {
         if(confirm("Yakin ingin menghapus seluruh riwayat scan barcode di perangkat ini?")) {
-            localStorage.removeItem('mitra10_scan_riwayat_v2');
+            localStorage.removeItem('mitra10_scan_riwayat_v3');
             muatRiwayatLokal();
             alert("Riwayat scan berhasil dibersihkan.");
         }
