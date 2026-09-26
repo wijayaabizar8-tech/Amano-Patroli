@@ -304,12 +304,6 @@
             <input type="password" id="loginPass" placeholder="Masukkan password...">
 
             <button class="btn btn-primary" style="margin-top: 15px;" onclick="prosesLogin()">Masuk Aplikasi</button>
-            
-            <div style="margin-top: 15px; font-size: 10px; color: #64748b; text-align: center; background: #f8fafc; padding: 8px; border-radius: 6px;">
-                💡 <b>Daftar Akun Utama:</b><br>
-                Admin: <b>admin</b> / <b>komandan123</b><br>
-                Petugas: <b>shodik</b> / <b>patroli123</b> atau <b>muri</b> / <b>patroli123</b>
-            </div>
         </div>
     </div>
 
@@ -449,24 +443,25 @@
     let fotoList = [];
     let currentUserIsAdmin = false;
 
-    // Database akun tersentralisasi di dalam kode (ubah atau tambahkan data di sini jika ingin permanen di semua HP)
+    // Database akun tersentralisasi dengan akun bawaan (Admin, Shodik, Muri, Arnol)
     function getDatabaseUser() {
-        let savedUsers = localStorage.getItem('mitra10_users_v3');
+        let savedUsers = localStorage.getItem('mitra10_users_v4');
         if(savedUsers) {
             return JSON.parse(savedUsers);
         } else {
             let defaultUsers = {
                 "admin": { pass: "komandan123", role: "Admin / Komandan", name: "Komandan Jaga", isAdmin: true },
-                "shodik": { pass: "patroli123", role: "Anggota / Petugas", name: "Shodik", isAdmin: false },
-                "muri": { pass: "patroli123", role: "Anggota / Petugas", name: "Muri", isAdmin: false }
+                "shodik": { pass: "shd", role: "Anggota / Petugas", name: "Shodik", isAdmin: false },
+                "muri": { pass: "Mri", role: "Anggota / Petugas", name: "Muri", isAdmin: false },
+                "arnol": { pass: "Arl", role: "Anggota / Petugas", name: "Arnol", isAdmin: false }
             };
-            localStorage.setItem('mitra10_users_v3', JSON.stringify(defaultUsers));
+            localStorage.setItem('mitra10_users_v4', JSON.stringify(defaultUsers));
             return defaultUsers;
         }
     }
 
     function saveDatabaseUser(db) {
-        localStorage.setItem('mitra10_users_v3', JSON.stringify(db));
+        localStorage.setItem('mitra10_users_v4', JSON.stringify(db));
     }
 
     function prosesFoto(input) {
@@ -570,7 +565,7 @@
 
         databaseUser[uNew] = { pass: pNew, role: "Anggota / Petugas", name: nNew, isAdmin: false };
         saveDatabaseUser(databaseUser);
-        alert(`Berhasil menambahkan akun: ${nNew}\n\nCatatan: Karena menggunakan GitHub Pages statis, agar akun ini bisa aktif di HP lain secara permanen, pastikan username & password tersebut juga ditambahkan ke dalam skrip kode utama Anda.`);
+        alert(`Berhasil menambahkan akun: ${nNew}`);
 
         document.getElementById('newMemberUser').value = '';
         document.getElementById('newMemberPass').value = '';
@@ -640,9 +635,9 @@
                     situasi: situasi
                 };
 
-                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v3')) || [];
+                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v4')) || [];
                 riwayatList.push(dataScanBaru);
-                localStorage.setItem('mitra10_scan_riwayat_v3', JSON.stringify(riwayatList));
+                localStorage.setItem('mitra10_scan_riwayat_v4', JSON.stringify(riwayatList));
 
                 if(currentUserIsAdmin) {
                     muatRiwayatLokal();
@@ -753,7 +748,7 @@
         if(!currentUserIsAdmin) return;
         
         const tbody = document.getElementById('historyTableBody');
-        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v3')) || [];
+        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v4')) || [];
 
         if (riwayatList.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888;">Belum ada riwayat scan tersimpan.</td></tr>';
@@ -777,7 +772,7 @@
 
     function hapusSemuaRiwayat() {
         if(confirm("Yakin ingin menghapus seluruh riwayat scan barcode di perangkat ini?")) {
-            localStorage.removeItem('mitra10_scan_riwayat_v3');
+            localStorage.removeItem('mitra10_scan_riwayat_v4');
             muatRiwayatLokal();
             alert("Riwayat scan berhasil dibersihkan.");
         }
