@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patroli Malam Mitra10 Kota Harapan Indah</title>
+    <!-- Pustaka QR Code Generator & Scanner -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0B2A5B;
+            --primary-light: #e8eef8;
+            --accent: #25D366;
+            --warning: #ff9800;
+            --danger: #e53935;
+            --bg-color: #f4f7fc;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: 12px;
+            color: var(--text-main);
+        }
+
+        .container {
+            max-width: 550px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .header-box {
+            text-align: center;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 19px;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .card {
+            background: #fafbfd;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 18px;
+        }
+
+        .card-highlight {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 12px;
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 4px;
+            color: var(--primary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(11, 42, 91, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-wa { background: var(--accent); color: white; }
+        .btn-scan { background: var(--warning); color: white; }
+        .btn-secondary { background: #64748b; color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        .quick-btn-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+
+        .quick-btn {
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .quick-btn-alert { border-color: #fca5a5; background: #fef2f2; color: #991b1b; }
+        .quick-btn-warn { border-color: #fde68a; background: #fffbeb; color: #92400e; }
+
+        #reader {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .barcode-box {
+            text-align: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .member-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-top: 6px;
+            font-size: 12px;
+        }
+
+        #loginPage { display: block; }
+        #appPage { display: none; }
+        
+        .login-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+        
+        .user-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-box">
+        <h2>🛡️ PATROLI MALAM</h2>
+        <div class="subtitle">MITRA10 KOTA HARAPAN INDAH</div>
+    </div>
+
+    <!-- HALAMAN LOGIN -->
+    <div id="loginPage">
+        <div class="login-card">
+            <div class="card-title">🔐 Silakan Login Sistem</div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Masukkan Username dan Password Anda.</p>
+            
+            <label>Username:</label>
+            <input type="text" id="loginUser" placeholder="Masukkan username...">
+
+            <label>Password:</label>
+            <input type="password" id="loginPass" placeholder="Masukkan password...">
+
+            <button class="btn btn-primary" style="margin-top: 15px;" onclick="prosesLogin()">Masuk Aplikasi</button>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 11px; color: #666; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <b>Akun Bawaan:</b><br>
+            • <b>Admin (Full Kontrol):</b> Username: <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">admin</code> | Password: <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">komandan123</code><br>
+            • <b>Petugas Contoh:</b> Username: <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">petugas1</code> | Password: <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">patroli123</code>
+        </div>
+    </div>
+
+    <!-- HALAMAN UTAMA APLIKASI -->
+    <div id="appPage">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div id="userInfoBadge" class="user-badge">Role: -</div>
+            <button onclick="logout()" style="background: none; border: none; color: var(--danger); font-weight: 600; font-size: 12px; cursor: pointer;">🚪 Logout</button>
+        </div>
+
+        <!-- PANEL KONTROL PENUH ADMIN (BARCODE & KELOLA ANGGOTA) -->
+        <div class="card" id="adminControlPanel" style="display: none; border-left: 4px solid var(--primary); background: #f8fafc;">
+            <div class="card-title">⚙️ Panel Kontrol Penuh Admin</div>
+            <p style="font-size:11px; color:var(--text-muted); margin:0 0 10px 0;">Menu manajemen sistem khusus Admin/Komandan.</p>
+            
+            <!-- SUB-MENU 1: BUAT BARCODE -->
+            <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 12px;">
+                <b style="font-size: 12px; color: var(--primary);">🖨️ Buat & Cetak Checkpoint</b>
+                <label>Nama Pos / Titik Checkpoint Baru:</label>
+                <input type="text" id="inputCheckpointName" placeholder="Contoh: Pintu Utama / Loading Dock">
+                <button class="btn btn-primary" style="margin-top: 6px;" onclick="generateBarcode()">Buat Barcode Checkpoint</button>
+                
+                <div id="barcodeContainer" class="barcode-box" style="display:none;">
+                    <p style="font-size:10px; color:var(--primary); font-weight:700; margin:0 0 5px 0;">PATROLI MALAM MITRA10 KHI</p>
+                    <p id="labelBarcodeTitle" style="font-weight:700; margin:0 0 8px 0; font-size:13px;"></p>
+                    <div id="qrcode" style="display:inline-block;"></div>
+                    <p style="font-size:10px; color:var(--text-muted); margin:8px 0 0 0;">Screenshot atau cetak barcode ini lalu tempel di lokasi.</p>
+                </div>
+            </div>
+
+            <!-- SUB-MENU 2: KELOLA AKUN ANGGOTA -->
+            <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <b style="font-size: 12px; color: var(--primary);">👥 Kelola Akun Anggota / Petugas</b>
+                
+                <label>Username Baru:</label>
+                <input type="text" id="newMemberUser" placeholder="Contoh: petugas2">
+                
+                <label>Password Baru:</label>
+                <input type="password" id="newMemberPass" placeholder="Contoh: patroli123">
+
+                <label>Nama Lengkap Petugas:</label>
+                <input type="text" id="newMemberName" placeholder="Contoh: Budi Santoso">
+
+                <button class="btn btn-primary" style="margin-top: 8px;" onclick="tambahAnggota()">➕ Tambah Anggota Baru</button>
+
+                <div style="margin-top: 12px;">
+                    <b style="font-size: 11px; color: var(--text-muted);">Daftar Petugas Terdaftar:</b>
+                    <div id="containerMemberList" style="max-height: 150px; overflow-y: auto; margin-top: 4px;">
+                        <!-- Muncul dinamis via script -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU 2: SCAN BARCODE SAAT PATROLI -->
+        <div class="card" style="border-color: #fde68a; background: #fffdf9;">
+            <div class="card-title" style="color: #b45309;">📷 Scan Barcode Lapangan</div>
+            <p style="font-size:11px; color:var(--text-muted); margin:0 0 8px 0;">Gunakan kamera HP untuk scan barcode checkpoint saat keliling malam.</p>
+            <button class="btn btn-scan" onclick="startScanner()">Buka Kamera Scanner</button>
+            <div id="reader"></div>
+            <button class="btn btn-danger" style="display:none; margin-top:8px;" id="btnCloseScanner" onclick="stopScanner()">Tutup Kamera</button>
+            
+            <label>Status Checkpoint Terakhir:</label>
+            <input type="text" id="lastCheck" readonly style="background:#f1f5f9; font-weight:600; color:var(--primary);" value="Belum ada checkpoint yang di-scan">
+        </div>
+
+        <!-- MENU 3: RINCIAN KEGIATAN & LAPORAN -->
+        <div class="card card-highlight">
+            <div class="card-title" style="color: #166534;">📝 Rincian Kegiatan & Laporan</div>
+            
+            <label>Nama Petugas Jaga:</label>
+            <input type="text" id="petugas" readonly style="background:#e2e8f0; font-weight:600;" placeholder="Nama petugas otomatis...">
+
+            <label>Pilih Cepat Temuan / Kegiatan:</label>
+            <div class="quick-btn-grid">
+                <button type="button" class="quick-btn" onclick="tambahAction('Memastikan semua akses pintu masuk area toko dalam keadaan terkunci rapat.')">🔒 Pintu Terkunci</button>
+                <button type="button" class="quick-btn" onclick="tambahAction('Memastikan aset kendaraan operasional Mitra10 aman.')">🚚 Kendaraan Aman</button>
+                <button type="button" class="quick-btn" onclick="tambahAction('Pengecekan kabel grounding & kelistrikan.')">🔌 Grounding</button>
+                <button type="button" class="quick-btn" onclick="tambahAction('Pengecekan panel listrik & genset aman.')">⚡ Panel Listrik</button>
+                <button type="button" class="quick-btn quick-btn-alert" onclick="tambahAction('TARUNA ALARM TOKO BERBUNYI - Sudah dicek dan direset.')">🚨 Alarm Bunyi</button>
+                <button type="button" class="quick-btn quick-btn-warn" onclick="tambahAction('Temuan lampu mati di area: ')">💡 Lampu Mati</button>
+            </div>
+
+            <label>Catatan / Rincian Patroli:</label>
+            <textarea id="action" rows="5" placeholder="Ketik rincian atau hasil scan otomatis masuk ke sini..."></textarea>
+
+            <label>Situasi Akhir Patroli:</label>
+            <select id="situasi">
+                <option>Situasi aman kondusif</option>
+                <option>Situasi ada temuan - Perlu tindak lanjut</option>
+                <option>Situasi hujan deras - Patroli terbatas</option>
+            </select>
+
+            <button class="btn btn-wa" onclick="kirimWA()">📱 Kirim Laporan ke WhatsApp</button>
+            <button class="btn btn-secondary" onclick="resetForm()">🗑️ Hapus & Isi Ulang</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Memuat database akun dari localStorage atau gunakan default awal
+    function getDatabaseUser() {
+        let savedUsers = localStorage.getItem('mitra10_users');
+        if(savedUsers) {
+            return JSON.parse(savedUsers);
+        } else {
+            let defaultUsers = {
+                "admin": { pass: "komandan123", role: "Admin / Komandan", name: "Komandan Jaga", isAdmin: true },
+                "petugas1": { pass: "patroli123", role: "Anggota / Petugas", name: "Petugas Jaga 1", isAdmin: false }
+            };
+            localStorage.setItem('mitra10_users', JSON.stringify(defaultUsers));
+            return defaultUsers;
+        }
+    }
+
+    function saveDatabaseUser(db) {
+        localStorage.setItem('mitra10_users', JSON.stringify(db));
+    }
+
+    function prosesLogin() {
+        let uInput = document.getElementById('loginUser').value.trim();
+        let pInput = document.getElementById('loginPass').value.trim();
+        let databaseUser = getDatabaseUser();
+
+        if(!uInput || !pInput) {
+            alert('Username dan Password wajib diisi!');
+            return;
+        }
+
+        if(databaseUser[uInput] && databaseUser[uInput].pass === pInput) {
+            let user = databaseUser[uInput];
+
+            document.getElementById('petugas').value = user.name;
+            document.getElementById('userInfoBadge').innerText = `Login: ${user.name} (${user.role})`;
+
+            if(user.isAdmin) {
+                document.getElementById('adminControlPanel').style.display = 'block';
+                renderMemberList();
+            } else {
+                document.getElementById('adminControlPanel').style.display = 'none';
+            }
+
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appPage').style.display = 'block';
+        } else {
+            alert('Username atau Password salah!');
+        }
+    }
+
+    function logout() {
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
+        document.getElementById('loginPage').style.display = 'block';
+        document.getElementById('appPage').style.display = 'none';
+    }
+
+    // Fungsi Tambah Anggota Baru oleh Admin
+    function tambahAnggota() {
+        let uNew = document.getElementById('newMemberUser').value.trim().toLowerCase();
+        let pNew = document.getElementById('newMemberPass').value.trim();
+        let nNew = document.getElementById('newMemberName').value.trim();
+
+        if(!uNew || !pNew || !nNew) {
+            alert('Semua kolom data anggota baru wajib diisi!');
+            return;
+        }
+
+        let databaseUser = getDatabaseUser();
+        if(databaseUser[uNew]) {
+            alert('Username tersebut sudah terdaftar! Gunakan username lain.');
+            return;
+        }
+
+        databaseUser[uNew] = {
+            pass: pNew,
+            role: "Anggota / Petugas",
+            name: nNew,
+            isAdmin: false
+        };
+
+        saveDatabaseUser(databaseUser);
+        alert(`Berhasil menambahkan anggota: ${nNew}`);
+
+        // Reset form input anggota
+        document.getElementById('newMemberUser').value = '';
+        document.getElementById('newMemberPass').value = '';
+        document.getElementById('newMemberName').value = '';
+
+        renderMemberList();
+    }
+
+    // Fungsi Hapus Anggota oleh Admin
+    function hapusAnggota(username) {
+        if(confirm(`Yakin ingin menghapus akun anggota dengan username "${username}"?`)) {
+            let databaseUser = getDatabaseUser();
+            delete databaseUser[username];
+            saveDatabaseUser(databaseUser);
+            renderMemberList();
+            alert('Akun anggota berhasil dihapus.');
+        }
+    }
+
+    // Render Tampilan Daftar Anggota di Panel Admin
+    function renderMemberList() {
+        let databaseUser = getDatabaseUser();
+        let container = document.getElementById('containerMemberList');
+        container.innerHTML = '';
+
+        for(let key in databaseUser) {
+            if(!databaseUser[key].isAdmin) {
+                let item = document.createElement('div');
+                item.className = 'member-list-item';
+                item.innerHTML = `
+                    <span><b>${databaseUser[key].name}</b> (${key})</span>
+                    <button class="btn btn-danger" style="width: auto; padding: 4px 8px; font-size: 11px; margin: 0;" onclick="hapusAnggota('${key}')">Hapus</button>
+                `;
+                container.appendChild(item);
+            }
+        }
+    }
+
+    // 1. Fungsi Generate Barcode (Khusus Admin)
+    function generateBarcode() {
+        let name = document.getElementById('inputCheckpointName').value;
+        if(!name) {
+            alert('Silakan masukkan nama pos/titik checkpoint terlebih dahulu!');
+            return;
+        }
+        document.getElementById('labelBarcodeTitle').innerText = "CHECKPOINT: " + name;
+        document.getElementById('qrcode').innerHTML = ""; 
+        
+        new QRCode(document.getElementById("qrcode"), {
+            text: "PATROLI MALAM MITRA10 KHI - CHECKPOINT: " + name,
+            width: 140,
+            height: 140
+        });
+        document.getElementById('barcodeContainer').style.display = "block";
+    }
+
+    // 2. Fungsi Scan Barcode dengan Kamera HP
+    let html5QrCode;
+    function startScanner() {
+        document.getElementById('reader').style.display = "block";
+        document.getElementById('btnCloseScanner').style.display = "flex";
+        
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            { fps: 10, qrbox: { width: 200, height: 200 } },
+            (decodedText, decodedResult) => {
+                let waktu = new Date().toLocaleTimeString();
+                let hasilScan = `[CHECKPOINT SCAN] ${decodedText} pada pukul ${waktu}`;
+                document.getElementById('lastCheck').value = decodedText + " (" + waktu + ")";
+                
+                tambahAction(hasilScan);
+                stopScanner();
+                alert("Berhasil Scan Checkpoint: " + decodedText);
+            },
+            (errorMessage) => {}
+        ).catch((err) => {
+            alert("Gagal membuka kamera. Pastikan izin kamera diaktifkan. Error: " + err);
+        });
+    }
+
+    function stopScanner() {
+        if(html5QrCode) {
+            html5QrCode.stop().then(() => {
+                document.getElementById('reader').style.display = "none";
+                document.getElementById('btnCloseScanner').style.display = "none";
+            }).catch(err => { console.log("Gagal stop scanner", err); });
+        }
+    }
+
+    // 3. Fungsi Tambah Teks Tombol Cepat
+    function tambahAction(teks){
+        let ta = document.getElementById('action');
+        let waktu = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        if(ta.value) ta.value += '\n';
+        ta.value += `- [${waktu}] ${teks}`;
+    }
+
+    // 4. Kirim Laporan ke WhatsApp
+    function kirimWA() {
+        let petugas = document.getElementById('petugas').value || "Petugas Jaga";
+        let action = document.getElementById('action').value;
+        let situasi = document.getElementById('situasi').value;
+        let tanggal = new Date().toLocaleDateString('id-ID', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+
+        if(!action) {
+            alert('Rincian kegiatan patroli masih kosong!');
+            return;
+        }
+
+        let pesan = `*LAPORAN PATROLI MALAM MITRA10 KOTA HARAPAN INDAH*%0A` +
+                    `📅 Hari/Tgl: ${tanggal}%0A` +
+                    `👤 Petugas: ${petugas}%0A%0A` +
+                    `*RINCIAN KEGIATAN & CHECKPOINT:*%0A${encodeURIComponent(action)}%0A%0A` +
+                    `🛡️ *Status Akhir:* ${encodeURIComponent(situasi)}`;
+
+        let waUrl = `https://api.whatsapp.com/send?text=${pesan}`;
+        window.open(waUrl, '_blank');
+    }
+
+    function resetForm() {
+        document.getElementById('action').value = '';
+        document.getElementById('lastCheck').value = 'Belum ada checkpoint yang di-scan';
+    }
+</script>
+
+</body>
+</html>
