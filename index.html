@@ -1,4 +1,4 @@
-     <!DOCTYPE html>
+       <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -166,7 +166,6 @@
         }
 
         .quick-btn-alert { border-color: #fca5a5; background: #fef2f2; color: #991b1b; }
-        .quick-btn-warn { border-color: #fde68a; background: #fffbeb; color: #92400e; }
 
         #reader {
             width: 100%;
@@ -219,6 +218,16 @@
             display: inline-block;
             margin-bottom: 10px;
         }
+
+        /* Styling Kolase Foto */
+        #collageCanvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -242,13 +251,6 @@
             <input type="password" id="loginPass" placeholder="Masukkan password...">
 
             <button class="btn btn-primary" style="margin-top: 15px;" onclick="prosesLogin()">Masuk Aplikasi</button>
-        </div>
-        
-        <div style="margin-top: 20px; font-size: 11px; color: #666; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
-            <b>Daftar Akun Petugas:</b><br>
-            • <b>Shodik (PJM 1):</b> Username: <code style="background:#e2e8f0; padding:2px 4px;">shodik</code> | Pass: <code style="background:#e2e8f0; padding:2px 4px;">patroli123</code><br>
-            • <b>Muri (PJM 2):</b> Username: <code style="background:#e2e8f0; padding:2px 4px;">muri</code> | Pass: <code style="background:#e2e8f0; padding:2px 4px;">patroli123</code><br>
-            • <b>Admin / Komandan:</b> Username: <code style="background:#e2e8f0; padding:2px 4px;">admin</code> | Pass: <code style="background:#e2e8f0; padding:2px 4px;">komandan123</code>
         </div>
     </div>
 
@@ -325,6 +327,14 @@
 
             <label>Rincian Kegiatan (Action):</label>
             <textarea id="action" rows="5" placeholder="Pilih tombol di atas atau ketik rincian kegiatan..."></textarea>
+
+            <!-- UPLOAD FOTO DOKUMENTASI & AUTOMATIC COLLAGE -->
+            <label> Upload Foto Kegiatan (Maks. 4 Foto untuk Kolase Otomatis):</label>
+            <input type="file" id="photoInput" accept="image/*" multiple onchange="generateCollage()">
+            <canvas id="collageCanvas"></canvas>
+            <a id="downloadBtn" style="display:none; text-decoration:none;" download="kolase_patroli_mitra10.jpg">
+                <button class="btn btn-secondary" style="margin-top:6px; font-size:12px;">💾 Unduh Gambar Kolase Foto</button>
+            </a>
 
             <label>Situasi Akhir Patroli:</label>
             <select id="situasi">
@@ -491,7 +501,72 @@
         ta.value += `* ${teks}`;
     }
 
-    // KIRIM LAPORAN PERSIS FORMAT CONTOH
+    // FUNGSI MEMBUAT KOLASE FOTO OTOMATIS
+    function generateCollage() {
+        const input = document.getElementById('photoInput');
+        const canvas = document.getElementById('collageCanvas');
+        const ctx = canvas.getContext('2d');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        if (!input.files || input.files.length === 0) return;
+
+        const files = Array.from(input.files).slice(0, 4); // Maksimal 4 foto
+        const images = [];
+        let loadedCount = 0;
+
+        files.forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    images.push(img);
+                    loadedCount++;
+                    if (loadedCount === files.length) {
+                        drawCanvas(images);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function drawCanvas(imgs) {
+            const size = 800;
+            canvas.width = size;
+            canvas.height = size;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+
+            if (imgs.length === 1) {
+                ctx.drawImage(imgs[0], 0, 0, size, size);
+            } else if (imgs.length === 2) {
+                ctx.drawImage(imgs[0], 0, 0, size / 2 - 2, size);
+                ctx.drawImage(imgs[1], size / 2 + 2, 0, size / 2 - 2, size);
+            } else if (imgs.length === 3) {
+                ctx.drawImage(imgs[0], 0, 0, size / 2 - 2, size);
+                ctx.drawImage(imgs[1], size / 2 + 2, 0, size / 2 - 2, size / 2 - 2);
+                ctx.drawImage(imgs[2], size / 2 + 2, size / 2 + 2, size / 2 - 2, size / 2 - 2);
+            } else {
+                ctx.drawImage(imgs[0], 0, 0, size / 2 - 2, size / 2 - 2);
+                ctx.drawImage(imgs[1], size / 2 + 2, 0, size / 2 - 2, size / 2 - 2);
+                ctx.drawImage(imgs[2], 0, size / 2 + 2, size / 2 - 2, size / 2 - 2);
+                ctx.drawImage(imgs[3], size / 2 + 2, size / 2 + 2, size / 2 - 2, size / 2 - 2);
+            }
+
+            // Watermark Otomatis Mitra10
+            ctx.fillStyle = "rgba(11, 42, 91, 0.7)";
+            ctx.fillRect(0, size - 50, size, 50);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 20px Inter, sans-serif";
+            ctx.fillText("DOKUMENTASI PATROLI MALAM - MITRA 10 KHI", 20, size - 18);
+
+            canvas.style.display = 'block';
+            downloadBtn.style.display = 'block';
+            downloadBtn.href = canvas.toDataURL('image/jpeg');
+        }
+    }
+
     function kirimWA() {
         let pjm1 = document.getElementById('pjm1').value || "-";
         let pjm2 = document.getElementById('pjm2').value || "-";
@@ -499,7 +574,6 @@
         let situasi = document.getElementById('situasi').value;
 
         let now = new Date();
-        let opsiHari = { weekday: 'Long' };
         let hari = now.toLocaleDateString('id-ID', { weekday: 'long' });
         
         let dd = String(now.getDate()).padStart(2, '0');
@@ -535,8 +609,11 @@
     function resetForm() {
         document.getElementById('action').value = '';
         document.getElementById('lastCheck').value = 'Belum ada checkpoint yang di-scan';
+        document.getElementById('photoInput').value = '';
+        document.getElementById('collageCanvas').style.display = 'none';
+        document.getElementById('downloadBtn').style.display = 'none';
     }
 </script>
 
 </body>
-</html>                     
+</html>                                      
