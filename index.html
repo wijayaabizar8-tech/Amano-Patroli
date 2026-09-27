@@ -202,7 +202,7 @@
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             margin-top: 6px;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .member-actions {
@@ -349,8 +349,8 @@
                 <button class="btn btn-primary" style="margin-top: 8px;" onclick="tambahAnggota()">➕ Tambah Akun Baru</button>
 
                 <div style="margin-top: 12px;">
-                    <b style="font-size: 11px; color: var(--text-muted);">Daftar Petugas Terdaftar:</b>
-                    <div id="containerMemberList" style="max-height: 180px; overflow-y: auto; margin-top: 4px;"></div>
+                    <b style="font-size: 11px; color: var(--text-muted);">Daftar Petugas Terdaftar & Sandi:</b>
+                    <div id="containerMemberList" style="max-height: 200px; overflow-y: auto; margin-top: 4px;"></div>
                 </div>
             </div>
         </div>
@@ -451,7 +451,7 @@
 
     // Database akun tersentralisasi dengan akun Admin, Shodik, Muri, Arnol
     function getDatabaseUser() {
-        let savedUsers = localStorage.getItem('mitra10_users_v5');
+        let savedUsers = localStorage.getItem('mitra10_users_v6');
         if(savedUsers) {
             return JSON.parse(savedUsers);
         } else {
@@ -461,13 +461,13 @@
                 "muri": { pass: "Mri", role: "Anggota / Petugas", name: "Muri", isAdmin: false },
                 "arnol": { pass: "Arl", role: "Anggota / Petugas", name: "Arnol", isAdmin: false }
             };
-            localStorage.setItem('mitra10_users_v5', JSON.stringify(defaultUsers));
+            localStorage.setItem('mitra10_users_v6', JSON.stringify(defaultUsers));
             return defaultUsers;
         }
     }
 
     function saveDatabaseUser(db) {
-        localStorage.setItem('mitra10_users_v5', JSON.stringify(db));
+        localStorage.setItem('mitra10_users_v6', JSON.stringify(db));
     }
 
     function prosesFoto(input) {
@@ -593,6 +593,7 @@
             databaseUser[username].pass = passBaru;
             saveDatabaseUser(databaseUser);
             alert(`Password untuk akun "${username}" berhasil diubah!`);
+            renderMemberList();
         }
     }
 
@@ -615,10 +616,13 @@
                 let item = document.createElement('div');
                 item.className = 'member-list-item';
                 item.innerHTML = `
-                    <span><b>${databaseUser[key].name}</b> (${key})</span>
+                    <div>
+                        <b>${databaseUser[key].name}</b><br>
+                        <span style="color:#64748b;">User: ${key} | Pass: <b style="color:var(--primary);">${databaseUser[key].pass}</b></span>
+                    </div>
                     <div class="member-actions">
-                        <button class="btn btn-warning" style="width: auto; padding: 4px 8px; font-size: 11px; margin: 0;" onclick="gantiPasswordAnggota('${key}')">🔑 Ganti Pass</button>
-                        <button class="btn btn-danger" style="width: auto; padding: 4px 8px; font-size: 11px; margin: 0;" onclick="hapusAnggota('${key}')">Hapus</button>
+                        <button class="btn btn-warning" style="width: auto; padding: 4px 8px; font-size: 10px; margin: 0;" onclick="gantiPasswordAnggota('${key}')">🔑 Ganti</button>
+                        <button class="btn btn-danger" style="width: auto; padding: 4px 8px; font-size: 10px; margin: 0;" onclick="hapusAnggota('${key}')">Hapus</button>
                     </div>
                 `;
                 container.appendChild(item);
@@ -661,9 +665,9 @@
                     situasi: situasi
                 };
 
-                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v5')) || [];
+                let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v6')) || [];
                 riwayatList.push(dataScanBaru);
-                localStorage.setItem('mitra10_scan_riwayat_v5', JSON.stringify(riwayatList));
+                localStorage.setItem('mitra10_scan_riwayat_v6', JSON.stringify(riwayatList));
 
                 if(currentUserIsAdmin) {
                     muatRiwayatLokal();
@@ -774,7 +778,7 @@
         if(!currentUserIsAdmin) return;
         
         const tbody = document.getElementById('historyTableBody');
-        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v5')) || [];
+        let riwayatList = JSON.parse(localStorage.getItem('mitra10_scan_riwayat_v6')) || [];
 
         if (riwayatList.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888;">Belum ada riwayat scan tersimpan.</td></tr>';
@@ -798,7 +802,7 @@
 
     function hapusSemuaRiwayat() {
         if(confirm("Yakin ingin menghapus seluruh riwayat scan barcode di perangkat ini?")) {
-            localStorage.removeItem('mitra10_scan_riwayat_v5');
+            localStorage.removeItem('mitra10_scan_riwayat_v6');
             muatRiwayatLokal();
             alert("Riwayat scan berhasil dibersihkan.");
         }
